@@ -1,0 +1,34 @@
+name: 每日抓取 AI 知识库
+
+# 可选：Vercel Hobby 套餐的 Cron 每天只能跑一次，
+# 想更新更频繁（比如每 6 小时），用这个工作流代替 / 补充。
+on:
+  schedule:
+    - cron: "30 0,6,12,18 * * *" # UTC 时间，对应北京时间 08:30 / 14:30 / 20:30 / 02:30
+  workflow_dispatch: {}
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: 触发抓取
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$SITE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "缺少 secrets：请在仓库 Settings → Secrets 里配置 SITE_URL 与 CRON_SECRET"
+            exit 1
+          fi
+          echo "触发 $SITE_URL/api/cron/crawl"
+          response=$(curl -sS -w "\n%{http_code}" --max-time 120 \
+            "$SITE_URL/api/cron/crawl?secret=$CRON_SECRET")
+          body=$(echo "$response" | head -n -1)
+          code=$(echo "$response" | tail -n 1)
+          echo "HTTP $code"
+          echo "$body"
+          if [ "$code" != "200" ]; then
+            echo "抓取失败"
+            exit 1
+          fi
