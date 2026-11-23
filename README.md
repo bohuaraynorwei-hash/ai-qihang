@@ -4,9 +4,9 @@
 
 ## 一键部署到 Vercel
 
-先把本项目推到你自己的 GitHub 仓库（公开即可），然后把下面链接里的 `YOUR_USERNAME` 换成你的 GitHub 用户名：
+先把本项目推到你的 GitHub 仓库（公开即可），按钮已按你的账号 `bohuaraynorwei-hash` 配置好：
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYOUR_USERNAME%2Fai-qihang&env=ADMIN_PASSWORD&env=CRON_SECRET&project-name=ai-qihang&repository-name=ai-qihang)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fbohuaraynorwei-hash%2Fai-qihang&env=ADMIN_PASSWORD&env=CRON_SECRET&project-name=ai-qihang&repository-name=ai-qihang)
 
 点按钮后按 Vercel 引导走完即可，一共三步：
 
