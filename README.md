@@ -2,6 +2,22 @@
 
 一个部署在 [Vercel](https://vercel.com) 上的中文 AI 学习平台：给**完全零基础**的用户讲清楚「提示词 / Agent / Skill」，配一个**每天自动更新**的 AI 知识库（全网 RSS 抓取 + 大模型中文摘要），并提供一个可视化**管理台**来配置数据源和爬虫用的大模型 API。
 
+## 一键部署到 Vercel
+
+先把本项目推到你自己的 GitHub 仓库（公开即可），然后把下面链接里的 `YOUR_USERNAME` 换成你的 GitHub 用户名：
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYOUR_USERNAME%2Fai-qihang&env=ADMIN_PASSWORD&env=CRON_SECRET&project-name=ai-qihang&repository-name=ai-qihang)
+
+点按钮后按 Vercel 引导走完即可，一共三步：
+
+1. **填环境变量**：按钮已带上 `ADMIN_PASSWORD`（管理台密码）和 `CRON_SECRET`（随便一串随机字符），Vercel 会自动弹出输入框让你填。
+2. **Deploy**：等 1 分钟左右构建完成，应用就上线了。
+3. **接 Redis（必须，否则知识库不保存）**：项目 → Storage → 新建 **Upstash Redis**（自动注入 `KV_REST_API_URL` / `KV_REST_API_TOKEN`），然后 **Redeploy** 一次。
+
+> 部署后访问 `/admin`，填大模型 API（可选），点「立即抓取一次」即可看到每日知识库开始更新。定时抓取（`vercel.json` 里的 Cron）在免费版每天只跑一次；想要更频繁，用仓库里的 `.github/workflows/crawl.yml`。
+
+> ⚠️ 建议再设一个 `NEXT_PUBLIC_SITE_URL`（你的正式域名，如 `https://你的项目.vercel.app`），用于 sitemap 和 RSS 里的绝对链接。
+
 ## 功能一览
 
 | 模块 | 说明 |
@@ -70,6 +86,8 @@ pnpm build && pnpm start
 ```
 
 ## 部署到 Vercel
+
+> 想一步到位，用上面的 **一键部署按钮** 即可；下面是无按钮的逐步说明（也适合二次部署/换项目名）。
 
 ### 第 1 步：推到 GitHub
 
