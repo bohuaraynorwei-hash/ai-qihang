@@ -130,6 +130,26 @@ export default async function LibraryPage({
           </Link>
         </div>
       </div>
+
+      <div
+        className="card"
+        style={{ marginTop: 18, background: "linear-gradient(120deg,#eef2ff,#f5f3ff)", borderColor: "#dfe3f8" }}
+      >
+        <div className="eyebrow">配套工具 · 可下载</div>
+        <div className="card-title">增量本地化工具包（Python）</div>
+        <p className="card-desc">
+          把「全量表 → 增量 → 四件套翻译 → 机检 QA → 锁定回写」做成一条命令。
+          带演示数据、术语表模板、风格指导模板，改配置即可用。只需 <code>pip install openpyxl</code>。
+        </p>
+        <div className="copy-row">
+          <a href="/downloads/incremental-l10n.zip" className="btn btn-primary btn-sm" download>
+            下载工具包
+          </a>
+          <Link href="/learn/inc-full-vs-delta" className="btn btn-line btn-sm">
+            配套课程 →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

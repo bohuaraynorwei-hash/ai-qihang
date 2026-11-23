@@ -63,7 +63,7 @@ export default async function HomePage() {
             </h1>
             <p className="hero-desc">
               从「帮我写个方案」到能设计自己的 Agent 和 Skill。
-              10 节课、{LIBRARY.length} 个可直接复制的模板，配一个每天自动更新的 AI
+              {LESSONS.length} 节课、{LIBRARY.length} 个可直接复制的模板，配一个每天自动更新的 AI
               知识库 —— 不用追进度，一天 15 分钟就够。
             </p>
             <div className="hero-actions">
@@ -123,6 +123,35 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+
+          <Link
+            href="/learn/l10n-basics"
+            className="card hoverable"
+            style={{
+              marginTop: 18,
+              background: "linear-gradient(120deg,#eef2ff,#f5f3ff)",
+              borderColor: "#dfe3f8",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 16,
+                flexWrap: "wrap",
+              }}
+            >
+              <div>
+                <div className="eyebrow">新增专题 · 6 节课</div>
+                <div className="card-title">语言本地化（i18n / l10n）</div>
+                <p className="card-desc">
+                  用 DeepSeek Harness + Codex 做翻译、术语管理、质检：从「翻译 ≠ 本地化」到「代码级本地化」的完整新手实战课。
+                </p>
+              </div>
+              <span className="btn btn-primary btn-sm">开始学 →</span>
+            </div>
+          </Link>
         </section>
 
         <section className="section">

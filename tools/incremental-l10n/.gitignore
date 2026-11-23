@@ -1,0 +1,26 @@
+# 你自己的配置和词表（示例文件保留）
+config.json
+glossary.md
+style-guide.md
+
+# 每次运行产生的中间产物
+delta.xlsx
+delta_translated.xlsx
+full_table_new.xlsx
+qa_report.json
+*.csv
+
+# 演示数据可以重新生成
+sample/delta*.xlsx
+sample/delta_translated.xlsx
+sample/full_table_new.xlsx
+sample/qa_report.json
+sample/d*.xlsx
+sample/t_*.xlsx
+sample/f_*.xlsx
+sample/r_*.json
+sample/bad*.xlsx
+sample/bad_report.json
+
+__pycache__/
+*.pyc

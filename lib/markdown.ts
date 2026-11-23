@@ -47,10 +47,16 @@ function inline(text: string): string {
   s = s.replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
   s = s.replace(
     /\[([^\]]+)\]\(([^)\s]+)\)/g,
-    (match, label: string, href: string) =>
-      /^https?:\/\//i.test(href)
-        ? `<a href="${href}" target="_blank" rel="noreferrer noopener">${label}</a>`
-        : match
+    (match, label: string, href: string) => {
+      // 站内相对链接（课程里指向 /downloads 之类的资源）也要放行
+      if (/^https?:\/\//i.test(href)) {
+        return `<a href="${href}" target="_blank" rel="noreferrer noopener">${label}</a>`;
+      }
+      if (/^\/[^/]/.test(href) && !/^\/\//.test(href)) {
+        return `<a href="${href}">${label}</a>`;
+      }
+      return match;
+    }
   );
   s = s.replace(/\u0000(\d+)\u0000/g, (_m, n: string) => `<code>${codes[Number(n)]}</code>`);
   return s;

@@ -1,0 +1,15 @@
+{
+  "api_base": "https://api.deepseek.com/v1",
+  "api_key": "",
+  "model": "deepseek-chat",
+  "source_lang": "英文",
+  "target_lang": "简体中文",
+  "batch_size": 10,
+  "length_ratio": 1.2,
+  "key_col": "key",
+  "source_col": "source",
+  "target_col": "zh",
+  "context_col": "context",
+  "glossary_file": "glossary.md",
+  "style_guide_file": "style-guide.md"
+}
