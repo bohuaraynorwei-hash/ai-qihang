@@ -18,6 +18,18 @@
 
 > ⚠️ 建议再设一个 `NEXT_PUBLIC_SITE_URL`（你的正式域名，如 `https://你的项目.vercel.app`），用于 sitemap 和 RSS 里的绝对链接。
 
+> 🖥 **不想用 Vercel？** 平台不依赖 Vercel，可以完整部署到腾讯云 / 阿里云 / 自建服务器。见 [DEPLOY-TENCENT.md](DEPLOY-TENCENT.md)（含轻量服务器、Docker、TKE 三种方案）。
+
+## 存储后端：三种模式自动识别
+
+| 场景 | 配置 | 说明 |
+| --- | --- | --- |
+| Vercel + Upstash | `KV_REST_API_URL` + `KV_REST_API_TOKEN` | HTTP REST 协议 |
+| 腾讯云 / 自建 Redis | `REDIS_URL=redis://:密码@host:6379/0` | 标准 RESP 协议（ioredis） |
+| 都没配 | — | 退化为内存，重启就丢（仅本地调试用） |
+
+代码会按上表顺序自动选择，不用改任何代码。部署前可跑 `npm run check:redis` 验证连通与读写。
+
 ## 功能一览
 
 | 模块 | 说明 |
@@ -116,8 +128,9 @@ git branch -M main && git remote add origin <你的仓库地址> && git push -u 
 | `ADMIN_PASSWORD` | ✅ | 管理台 `/admin` 登录密码，设个长的 |
 | `CRON_SECRET` | ✅ | 定时任务密钥，随机长串即可 |
 | `NEXT_PUBLIC_SITE_URL` | 建议 | 你的正式域名，如 `https://ai-qihang.vercel.app`（用于 sitemap/RSS） |
-| `KV_REST_API_URL` | ✅ | Upstash Redis 地址 |
-| `KV_REST_API_TOKEN` | ✅ | Upstash Redis Token |
+| `KV_REST_API_URL` | ✅ | Upstash Redis 地址（Vercel 部署用） |
+| `KV_REST_API_TOKEN` | ✅ | Upstash Redis Token（Vercel 部署用） |
+| `REDIS_URL` | 视部署 | 腾讯云/自建 Redis 时用它代替上面两个 |
 | `LLM_BASE_URL` | 可选 | 兜底用的大模型地址（更推荐在管理台配，随时改） |
 | `LLM_API_KEY` | 可选 | 兜底用的大模型 Key |
 | `LLM_MODEL` | 可选 | 模型名 |

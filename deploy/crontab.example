@@ -1,0 +1,16 @@
+# 定时抓取：系统 crontab 示例（替代 Vercel Cron）
+#
+# 安装：crontab -e    然后把下面几行粘进去（注意换成你的实际路径）
+# 查看日志：tail -f /var/log/ai-qihang-crawl.log
+#
+# 时区提醒：crontab 用的是服务器本地时区。腾讯云 CVM 默认 Asia/Shanghai，
+# 如果你的是 UTC，想在北京时间 08:30 跑，就写成 30 0 * * *。
+
+# 每天北京时间 08:30 抓一次
+30 8 * * * cd /opt/ai-qihang && SITE_URL=http://127.0.0.1:3000 CRON_SECRET=你的密钥 /usr/bin/node scripts/trigger-crawl.mjs >> /var/log/ai-qihang-crawl.log 2>&1
+
+# 想更频繁（每 6 小时）：把上面那行换成下面这行
+# 30 0,6,12,18 * * * cd /opt/ai-qihang && SITE_URL=http://127.0.0.1:3000 CRON_SECRET=你的密钥 /usr/bin/node scripts/trigger-crawl.mjs >> /var/log/ai-qihang-crawl.log 2>&1
+
+# 如果你用 PM2，也可以用 PM2 的 cron 能力（ecosystem.config.cjs 里加 cron_restart 不适用，
+# 需要单独加一条 one-off app，简单起见还是推荐系统 crontab）。

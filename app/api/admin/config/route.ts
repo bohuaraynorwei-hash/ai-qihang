@@ -1,6 +1,6 @@
 import { checkAdmin, deny, json, jsonError } from "@/lib/auth";
 import { resolveLLM } from "@/lib/llm";
-import { getConfig, getItems, normalizeConfig, saveConfig, storageMode } from "@/lib/store";
+import { getConfig, getItems, normalizeConfig, saveConfig, storageBackend, storageLabel, storageMode } from "@/lib/store";
 import type { Category, CrawlConfig, LLMConfig, Source } from "@/lib/types";
 import { hashId } from "@/lib/util";
 
@@ -69,12 +69,15 @@ async function statusPayload(config: CrawlConfig) {
   const items = await getItems();
   return {
     storage: storageMode(),
+    storageBackend: storageBackend(),
+    storageLabel: storageLabel(),
     items: items.length,
     adminConfigured: Boolean(process.env.ADMIN_PASSWORD),
     cronConfigured: Boolean(process.env.CRON_SECRET),
     llmEnabled: resolveLLM(config.llm).enabled,
     llmKeySet: Boolean(config.llm.apiKey) || Boolean(process.env.LLM_API_KEY),
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "",
+    platform: process.env.VERCEL ? "vercel" : "self-hosted",
   };
 }
 

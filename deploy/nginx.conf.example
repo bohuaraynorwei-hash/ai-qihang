@@ -1,0 +1,63 @@
+# Nginx 反向代理示例（腾讯云 CVM / 轻量应用服务器）
+# 放到 /etc/nginx/conf.d/ai-qihang.conf，然后 nginx -t && systemctl reload nginx
+#
+# 说明：
+# - 证书用腾讯云「SSL 证书」免费证书，下载 Nginx 版本，把两个 pem/key 路径换成你的
+# - 抓取接口耗时长（最长 60s），所以 proxy_read_timeout 要放宽
+
+upstream ai_qihang_app {
+    server 127.0.0.1:3000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name your-domain.com;
+    # 强制跳 HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    # ↓↓↓ 换成腾讯云证书的实际路径 ↓↓↓
+    ssl_certificate     /etc/nginx/ssl/your-domain.com_bundle.crt;
+    ssl_certificate_key /etc/nginx/ssl/your-domain.com.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_session_timeout 10m;
+
+    client_max_body_size 10m;
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript application/xml application/rss+xml image/svg+xml;
+    gzip_min_length 1024;
+
+    # 抓取和后台接口超时放宽
+    proxy_connect_timeout 10s;
+    proxy_send_timeout    120s;
+    proxy_read_timeout    120s;
+
+    location /_next/static/ {
+        proxy_pass http://ai_qihang_app;
+        proxy_cache_valid 200 365d;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # 下载的工具包（静态文件）
+    location /downloads/ {
+        proxy_pass http://ai_qihang_app;
+        add_header Cache-Control "public, max-age=86400";
+    }
+
+    location / {
+        proxy_pass http://ai_qihang_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

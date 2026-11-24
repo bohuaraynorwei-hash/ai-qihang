@@ -6,9 +6,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
+    "crawl": "node scripts/trigger-crawl.mjs",
+    "check:redis": "node scripts/check-redis.mjs"
   },
   "dependencies": {
+    "ioredis": "^5.11.1",
     "next": "^15.5.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"

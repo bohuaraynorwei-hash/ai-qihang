@@ -9,12 +9,15 @@ type SafeConfig = CrawlConfig & { llmKeySet?: boolean };
 
 interface Status {
   storage: string;
+  storageBackend?: string;
+  storageLabel?: string;
   items: number;
   adminConfigured: boolean;
   cronConfigured: boolean;
   llmEnabled: boolean;
   llmKeySet: boolean;
   siteUrl: string;
+  platform?: string;
 }
 
 const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
@@ -331,8 +334,11 @@ export function AdminApp() {
 
       {status?.storage === "memory" && (
         <div className="alert alert-warn">
-          当前没有配置 Redis（<code>KV_REST_API_URL</code> / <code>KV_REST_API_TOKEN</code>），
-          抓到的内容不会保存下来，刷新就没了。请先在 Vercel 里加一个 Upstash Redis。
+          当前没有配置持久化存储，抓到的内容不会保存下来，刷新就没了。二选一：
+          <br />
+          · Vercel / Upstash：配置 <code>KV_REST_API_URL</code> + <code>KV_REST_API_TOKEN</code>
+          <br />
+          · 腾讯云 / 自建：配置 <code>REDIS_URL</code>（形如 <code>redis://:密码@IP:6379/0</code>）
         </div>
       )}
       {status && !status.adminConfigured && (
@@ -580,7 +586,7 @@ export function AdminApp() {
             <div className="kv">
               <span>存储方式</span>
               <span style={{ color: status?.storage === "redis" ? "#047857" : "#b45309" }}>
-                {status?.storage === "redis" ? "Upstash Redis（已持久化）" : "内存（不持久化）"}
+                {status?.storage === "redis" ? `${status?.storageLabel || "Redis"}（已持久化）` : "内存（不持久化）"}
               </span>
             </div>
             <div className="kv">
