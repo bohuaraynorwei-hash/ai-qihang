@@ -10,11 +10,12 @@ export const metadata: Metadata = {
 };
 
 const DEFAULT_TRACK = "AI 基础入门";
-const TRACK_ORDER = [DEFAULT_TRACK, "进阶深化", "本地化专题", "多语言对照翻译", "增量本地化"];
+const TRACK_ORDER = [DEFAULT_TRACK, "进阶深化", "工具生态", "本地化专题", "多语言对照翻译", "增量本地化"];
 
 const TRACK_DESC: Record<string, string> = {
   [DEFAULT_TRACK]: "顺序按难度排好了。每节课末尾都有练习 —— 只看不练，等于没学。",
   进阶深化: "基础之上的四个进阶杠杆：系统提示词、结构化输出、Agent 运维、Skill 版本管理。",
+  工具生态: "Hook / Skill / MCP / 插件到底差在哪，以及怎么定期清理挂件、让 AI 保持灵敏。",
   本地化专题: "用 AI 做翻译、术语管理、质检：从「翻译 ≠ 本地化」到「代码级本地化」。基于 DeepSeek Harness 与 Codex。",
   多语言对照翻译: "一份源文翻译成 N 种语言：对照表、批量脚本、多语言质检与交付清单。",
   增量本地化: "专业生产流水线：全量表 + 术语表 + 风格指导 + checklist 组合生成增量翻译，独立 QA 与锁定回写。",
