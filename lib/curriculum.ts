@@ -1319,7 +1319,7 @@ Codex 会执行命令、改文件，所以红线要提前划：
   },
   {
     slug: "adv-system-prompt",
-    index: 17,
+    index: 27,
     title: "系统提示词：给 AI 定人设和规则",
     subtitle: "用户看不到但一直生效的「宪法」，决定它怎么说话",
     minutes: 13,
@@ -1371,7 +1371,7 @@ ${F}
   },
   {
     slug: "adv-structured-output",
-    index: 18,
+    index: 28,
     title: "结构化输出：让 AI 交「能用的作业」",
     subtitle: "JSON Schema、few-shot、自检，让输出能喂给程序和表格",
     minutes: 14,
@@ -1416,7 +1416,7 @@ ${F}
   },
   {
     slug: "adv-agent-ops",
-    index: 19,
+    index: 29,
     title: "Agent 实战：记忆、评测、止损",
     subtitle: "记不住、好坏说不清、停不下来——三个问题的解法",
     minutes: 14,
@@ -1460,7 +1460,7 @@ ${F}
   },
   {
     slug: "adv-skill-ops",
-    index: 20,
+    index: 30,
     title: "Skill 进阶：组合、版本、团队共享",
     subtitle: "什么时候拆分/合并，怎么管理版本，怎么让团队能用",
     minutes: 13,
@@ -1501,7 +1501,7 @@ ${F}
   },
   {
     slug: "mlt-parallel",
-    index: 21,
+    index: 17,
     title: "多语言对照翻译：一份源文，N 种语言",
     subtitle: "交付一张对照表，比交付 N 份文件更省心",
     minutes: 12,
@@ -1537,7 +1537,7 @@ ${F}
   },
   {
     slug: "mlt-batch",
-    index: 22,
+    index: 18,
     title: "批量制作多语言对照表",
     subtitle: "分批 + 术语表 + 脚本，把几百条一次跑完",
     minutes: 16,
@@ -1602,7 +1602,7 @@ ${F}
   },
   {
     slug: "mlt-qa",
-    index: 23,
+    index: 19,
     title: "多语言质检：跨语言一致性",
     subtitle: "完整性 + 每种语言的术语一致 + 长度，一次查完",
     minutes: 13,
@@ -1640,7 +1640,7 @@ ${F}
   },
   {
     slug: "mlt-delivery",
-    index: 24,
+    index: 20,
     title: "术语表多语言扩展 + 交付清单",
     subtitle: "把术语表扩成 N 语言，交付前照清单过一遍",
     minutes: 12,
@@ -1680,7 +1680,7 @@ ${F}
   },
   {
     slug: "inc-full-vs-delta",
-    index: 25,
+    index: 21,
     title: "全量表 vs 增量表：先分清「整本」和「这一批」",
     subtitle: "用一张主表管全部文本，每轮只翻「新增和变更」的那部分",
     minutes: 13,
@@ -1737,7 +1737,7 @@ ${F}
   },
   {
     slug: "inc-style-guide",
-    index: 26,
+    index: 22,
     title: "风格指导：给翻译一个统一人格",
     subtitle: "人称、语气、标点、长度——一份能喂给 AI 的 Style Guide",
     minutes: 13,
@@ -1789,7 +1789,7 @@ ${F}
   },
   {
     slug: "inc-glossary-checklist",
-    index: 27,
+    index: 23,
     title: "术语表 + checklist：两件「宪法」",
     subtitle: "术语表管「翻成什么」，checklist 管「翻得对不对」",
     minutes: 13,
@@ -1838,7 +1838,7 @@ ${F}
   },
   {
     slug: "inc-generate",
-    index: 28,
+    index: 24,
     title: "四件套组合：从增量表生成翻译内容",
     subtitle: "全量表 + 术语表 + 风格指导 + checklist，一次喂给 AI",
     minutes: 18,
@@ -1907,7 +1907,7 @@ ${F}
   },
   {
     slug: "inc-qa",
-    index: 29,
+    index: 25,
     title: "独立 QA：翻译之外的第二道关",
     subtitle: "机检 + AI 独立评判，不和翻译共用一套提示词",
     minutes: 16,
@@ -1983,7 +1983,7 @@ ${F}
   },
   {
     slug: "inc-lock",
-    index: 30,
+    index: 26,
     title: "锁定与回写：把成品写回全量表",
     subtitle: "QA 通过后标记状态、写回主表、留审计，才算真正交付",
     minutes: 13,
@@ -2269,18 +2269,105 @@ ${F}
   },
 ];
 
+// ============================================================================
+// 顺序的唯一来源
+// ----------------------------------------------------------------------------
+// 课程在 LESSONS 数组里的顺序 ≠ 学习路径上的顺序：路径按「阶段」分组渲染，
+// 而阶段是按难度排的，所以数组里同一阶段的课可能被后面补的课打断。
+//
+// 曾经这里出过一个 bug：neighbors() 用数组下标算「上一课/下一课」，
+// 学习路径页却按阶段分组渲染，两套顺序在 3 个衔接点上不一致，
+// 表现为「结束第 2 阶段却跳到第 5 阶段」。
+//
+// 现在只保留一套顺序：ORDERED_LESSONS。所有展示与导航都必须用它。
+// ============================================================================
+
+export const DEFAULT_TRACK = "01 · AI 基本功";
+
+/** 阶段顺序（唯一来源，学习路径页与前后课导航都读这里） */
+export const TRACK_ORDER = [
+  DEFAULT_TRACK,
+  "02 · 翻译与术语",
+  "03 · 多语言批量",
+  "04 · 增量流水线",
+  "05 · 自动化进阶",
+] as const;
+
+export interface TrackMeta {
+  name: string;
+  desc: string;
+  /** 学完能做到什么 */
+  goal: string;
+}
+
+export const TRACK_META: Record<string, TrackMeta> = {
+  [DEFAULT_TRACK]: {
+    name: DEFAULT_TRACK,
+    desc: "本地化的人也需要先会用 AI。这几节只讲干活用得上的：提问、上下文、安全边界。",
+    goal: "能独立完成一次「把小事交给 AI」",
+  },
+  "02 · 翻译与术语": {
+    name: "02 · 翻译与术语",
+    desc: "从「翻译 ≠ 本地化」到术语表、上下文翻译、机翻校订，最后用 Codex 落到文件里。",
+    goal: "能交付一份术语一致、占位符完整的译文",
+  },
+  "03 · 多语言批量": {
+    name: "03 · 多语言批量",
+    desc: "一份源文翻成 N 种语言：对照表、批量脚本、多语言质检与交付清单。",
+    goal: "能一次产出多语言对照表并自检",
+  },
+  "04 · 增量流水线": {
+    name: "04 · 增量流水线",
+    desc: "专业生产流水线：全量表 + 术语表 + 风格指导 + checklist 生成增量，独立 QA 与锁定回写。",
+    goal: "能跑通「增量→翻译→QA→锁定」全流程",
+  },
+  "05 · 自动化进阶": {
+    name: "05 · 自动化进阶",
+    desc: "让流程自己跑：Agent、工具权限、Skill 版本、Hook/Skill/MCP/插件怎么选，以及定期清理挂件。",
+    goal: "能把重复环节交给流程，并保持环境干净",
+  },
+};
+
+export function trackOf(lesson: Lesson): string {
+  const t = lesson.track ?? DEFAULT_TRACK;
+  // 未登记的阶段名兜底到最后一个阶段，避免课程从路径上消失
+  return TRACK_ORDER.includes(t as (typeof TRACK_ORDER)[number]) ? t : DEFAULT_TRACK;
+}
+
+/** 按阶段分组（阶段内保持数组顺序）——学习路径页直接用它渲染 */
+export const LESSON_GROUPS: { meta: TrackMeta; lessons: Lesson[] }[] = TRACK_ORDER.map((name) => ({
+  meta: TRACK_META[name] ?? { name, desc: "", goal: "" },
+  lessons: LESSONS.filter((l) => trackOf(l) === name),
+})).filter((g) => g.lessons.length > 0);
+
+/**
+ * 学习路径上的真实顺序：先按阶段，再按阶段内的数组顺序。
+ * 前后课导航、编号、侧边栏课程列表都必须用这一份。
+ */
+export const ORDERED_LESSONS: Lesson[] = LESSON_GROUPS.flatMap((g) => g.lessons);
+
+/** 每课在学习路径上的位置（1 起）与所属阶段序号（1 起） */
+export function positionOf(slug: string): { order: number; trackIndex: number } | null {
+  const idx = ORDERED_LESSONS.findIndex((l) => l.slug === slug);
+  if (idx < 0) return null;
+  const track = trackOf(ORDERED_LESSONS[idx]);
+  const trackIndex = LESSON_GROUPS.findIndex((g) => g.meta.name === track) + 1;
+  return { order: idx + 1, trackIndex };
+}
+
 export const LESSON_MAP = new Map(LESSONS.map((l) => [l.slug, l]));
 
 export function getLesson(slug: string): Lesson | undefined {
   return LESSON_MAP.get(slug);
 }
 
-export function neighbors(slug: string) {
-  const idx = LESSONS.findIndex((l) => l.slug === slug);
+/** 上一课 / 下一课：严格按学习路径顺序，而不是数组下标 */
+export function neighbors(slug: string): { prev: Lesson | null; next: Lesson | null } {
+  const idx = ORDERED_LESSONS.findIndex((l) => l.slug === slug);
   if (idx < 0) return { prev: null, next: null };
   return {
-    prev: idx > 0 ? LESSONS[idx - 1] : null,
-    next: idx < LESSONS.length - 1 ? LESSONS[idx + 1] : null,
+    prev: idx > 0 ? ORDERED_LESSONS[idx - 1] : null,
+    next: idx < ORDERED_LESSONS.length - 1 ? ORDERED_LESSONS[idx + 1] : null,
   };
 }
 

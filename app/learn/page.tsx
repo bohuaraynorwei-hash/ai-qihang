@@ -1,48 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LESSONS, TOTAL_MINUTES } from "@/lib/curriculum";
+import { LESSON_GROUPS, LESSONS, TOTAL_MINUTES } from "@/lib/curriculum";
 import { DoneBadge, ProgressPill } from "@/components/progress";
 
 export const metadata: Metadata = {
   title: "学习路径",
   description:
-    "从「AI 能帮我做什么」到设计 Agent 和 Skill，再到用 DeepSeek Harness + Codex 做本地化。每节 10-18 分钟，配练习。",
-};
-
-const DEFAULT_TRACK = "01 · AI 基本功";
-const TRACK_ORDER = [
-  DEFAULT_TRACK,
-  "02 · 翻译与术语",
-  "03 · 多语言批量",
-  "04 · 增量流水线",
-  "05 · 自动化进阶",
-];
-
-const TRACK_DESC: Record<string, string> = {
-  [DEFAULT_TRACK]: "本地化的人也需要先会用 AI。这几节只讲干活用得上的：提问、上下文、安全边界。",
-  "02 · 翻译与术语": "从「翻译 ≠ 本地化」到术语表、上下文翻译、机翻校订，最后用 Codex 落到文件里。",
-  "03 · 多语言批量": "一份源文翻成 N 种语言：对照表、批量脚本、多语言质检与交付清单。",
-  "04 · 增量流水线": "专业生产流水线：全量表 + 术语表 + 风格指导 + checklist 生成增量，独立 QA 与锁定回写。",
-  "05 · 自动化进阶": "让流程自己跑：Agent、工具权限、Skill 版本、Hook/Skill/MCP/插件怎么选，以及定期清理挂件。",
-};
-
-const TRACK_GOAL: Record<string, string> = {
-  [DEFAULT_TRACK]: "能独立完成一次「把小事交给 AI」",
-  "02 · 翻译与术语": "能交付一份术语一致、占位符完整的译文",
-  "03 · 多语言批量": "能一次产出多语言对照表并自检",
-  "04 · 增量流水线": "能跑通「增量→翻译→QA→锁定」全流程",
-  "05 · 自动化进阶": "能把重复环节交给流程，并保持环境干净",
+    "游戏本地化的 AI 学习路径：5 个阶段 31 节课，从「会用 AI」到「能跑增量流水线」。每节 10-18 分钟，配练习。",
 };
 
 export default function LearnPage() {
   const hours = Math.round((TOTAL_MINUTES / 60) * 10) / 10;
-
-  const groups = TRACK_ORDER.map((name) => ({
-    name,
-    desc: TRACK_DESC[name] || "",
-    goal: TRACK_GOAL[name] || "",
-    lessons: LESSONS.filter((l) => (l.track ?? DEFAULT_TRACK) === name),
-  })).filter((g) => g.lessons.length > 0);
+  // 阶段顺序与课程序号的唯一来源都在 lib/curriculum，这里不再自己定义一份
+  const groups = LESSON_GROUPS;
 
   return (
     <div className="container" style={{ paddingTop: 40 }}>
@@ -60,7 +30,7 @@ export default function LearnPage() {
       </div>
 
       {groups.map((group, gi) => (
-        <section key={group.name} style={{ marginTop: 28 }}>
+        <section key={group.meta.name} style={{ marginTop: 28 }}>
           <div
             className="section-head"
             style={{ marginBottom: 14, alignItems: "baseline", paddingBottom: 12, borderBottom: "1px solid var(--line)" }}
@@ -85,14 +55,14 @@ export default function LearnPage() {
               </span>
               <div>
                 <h2 className="section-title" style={{ fontSize: 20 }}>
-                  {group.name}
+                  {group.meta.name}
                 </h2>
                 <p className="section-desc" style={{ fontSize: 14, marginTop: 4 }}>
-                  {group.desc}
+                  {group.meta.desc}
                 </p>
-                {group.goal && (
+                {group.meta.goal && (
                   <p style={{ fontSize: 13, marginTop: 6, color: "var(--brand)", fontWeight: 600 }}>
-                    学完能做到：{group.goal}
+                    学完能做到：{group.meta.goal}
                   </p>
                 )}
               </div>

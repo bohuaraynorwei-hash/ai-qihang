@@ -9,7 +9,8 @@
     "start": "next start",
     "start:standalone": "node .next/standalone/server.js",
     "crawl": "node scripts/trigger-crawl.mjs",
-    "check:redis": "node scripts/check-redis.mjs"
+    "check:redis": "node scripts/check-redis.mjs",
+    "test:nav": "node scripts/test-nav.mjs"
   },
   "dependencies": {
     "ioredis": "^5.11.1",

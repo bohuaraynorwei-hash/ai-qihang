@@ -97,6 +97,25 @@ pnpm dev                     # http://localhost:3000
 pnpm build && pnpm start
 ```
 
+## 自检脚本
+
+部署后建议跑一遍，用来防止回归：
+
+```bash
+# 检查线上 31 节课的「下一课 / 下一阶段」是否与学习路径顺序一致
+SITE_URL=https://你的域名 node scripts/test-nav.mjs
+
+# 检查 Redis 连通与读写（部署前跑）
+REDIS_URL=redis://:密码@IP:6379/0 node scripts/check-redis.mjs
+
+# 手动触发一次抓取（cron 同款逻辑）
+SITE_URL=https://你的域名 CRON_SECRET=xxx node scripts/trigger-crawl.mjs
+```
+
+> **关于课程顺序**：课程按「阶段」分组渲染，而 `LESSONS` 数组里的顺序和阶段顺序**不一定相同**（补加的课会接在数组末尾）。
+> 因此顺序的唯一来源是 `lib/curriculum.ts` 里的 `ORDERED_LESSONS`；前后课导航、课序号、侧边栏都必须用它，
+> 不要直接用 `LESSONS` 的下标。`scripts/test-nav.mjs` 就是守这条规则的。
+
 ## 部署到 Vercel
 
 > 想一步到位，用上面的 **一键部署按钮** 即可；下面是无按钮的逐步说明（也适合二次部署/换项目名）。
