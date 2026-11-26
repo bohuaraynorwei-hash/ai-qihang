@@ -89,11 +89,28 @@ export default async function LibraryPage({
 
             <p className="lib-goal">{item.goal}</p>
             <p className="lib-when">
-              <strong>什么时候用：</strong>
+              <strong>✅ 什么时候用：</strong>
               {item.when}
             </p>
+            {item.whenNot && (
+              <p className="lib-when lib-whennot">
+                <strong>❌ 什么时候别用：</strong>
+                {item.whenNot}
+              </p>
+            )}
+            {item.output && (
+              <p className="lib-when lib-output">
+                <strong>📦 用它你能拿到：</strong>
+                {item.output}
+              </p>
+            )}
 
             <div className="chips">
+              {item.model && (
+                <span className="chip" style={{ background: "#eef2ff", color: "#4338ca" }}>
+                  推荐：{item.model}
+                </span>
+              )}
               {item.tags.map((tag) => (
                 <span key={tag} className="chip">
                   #{tag}

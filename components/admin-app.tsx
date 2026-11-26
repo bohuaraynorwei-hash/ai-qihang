@@ -409,6 +409,15 @@ export function AdminApp() {
                       />
                       只收 AI 相关
                     </label>
+                    <label style={{ fontSize: 12.5, color: "var(--muted)", display: "flex", gap: 6, alignItems: "center" }}>
+                      <input
+                        className="check"
+                        type="checkbox"
+                        checked={Boolean(source.l10nOnly)}
+                        onChange={(event) => patchSource(index, { l10nOnly: event.target.checked })}
+                      />
+                      只收本地化相关
+                    </label>
                   </div>
                 </div>
                 <button

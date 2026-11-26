@@ -10,6 +10,8 @@ export interface Source {
   note?: string;
   /** true = 该源是泛科技源，只保留命中 AI 关键词的条目 */
   aiOnly?: boolean;
+  /** true = 泛 AI 源，只保留「跟本地化/翻译沾边」的条目 */
+  l10nOnly?: boolean;
 }
 
 export interface LLMConfig {

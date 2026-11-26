@@ -1,52 +1,66 @@
 import Link from "next/link";
-import { CATEGORY_META } from "@/lib/defaults";
 import { LESSONS, TOTAL_MINUTES } from "@/lib/curriculum";
 import { LIBRARY } from "@/lib/library";
+import { GLOSSARY } from "@/lib/glossary";
 import { getConfig, getItems } from "@/lib/store";
 import { sortByTime } from "@/lib/query";
-import { formatDateTime, relTime } from "@/lib/util";
+import { relTime } from "@/lib/util";
+import { CATEGORY_META } from "@/lib/defaults";
 import { CopyButton } from "@/components/copy-button";
+import { LevelQuiz } from "@/components/level-quiz";
 
 export const dynamic = "force-dynamic";
 
-const TRACKS = [
+/** 三档入口：按水平分流，不按岗位分类 */
+const TIERS = [
   {
-    icon: "✎",
-    title: "提示词",
-    desc: "同一个模型，会问和不会问差 5 倍。六段式模板 + 三个进阶杠杆。",
-    href: "/learn/prompt-basics",
-    badge: "第 2-3 课",
+    emoji: "🌱",
+    title: "第一次用 AI",
+    desc: "没用过也没关系。第 1 课就让你用 AI 完成一件真实的小事，15 分钟出结果。",
+    href: "/learn/start-here",
+    meta: "01 基本功 · 10 节课",
+    cta: "从第 1 课开始",
   },
   {
-    icon: "⚙",
-    title: "Agent",
-    desc: "从「会聊天」到「会干活」：目标、工具、循环、记忆，以及什么时候别用。",
-    href: "/learn/agent-basics",
-    badge: "第 5-6 课",
+    emoji: "🚀",
+    title: "已经在做本地化",
+    desc: "术语漂移、占位符丢失、翻完还要人工对一遍——这些都有对应的流程和模板。",
+    href: "/learn/l10n-basics",
+    meta: "02 翻译与术语 · 6 节课",
+    cta: "进翻译实战",
   },
   {
-    icon: "❖",
-    title: "Skill",
-    desc: "把用过 3 次以上的提示词，变成同事也能直接调用的技能包。",
-    href: "/learn/skill-basics",
-    badge: "第 7 课",
+    emoji: "💡",
+    title: "想搭一条流水线",
+    desc: "只翻增量、独立 QA、锁定回写。附一套能直接跑的 Python 工具包和演示数据。",
+    href: "/learn/inc-full-vs-delta",
+    meta: "04 增量流水线 · 6 节课",
+    cta: "进增量流水线",
   },
 ];
 
-const STEPS = [
-  { day: "今天", title: "先做一件小事", desc: "用 AI 写完一封你本来要写的邮件" },
-  { day: "第 1 周", title: "把话说清楚", desc: "掌握六段式提示词，能写出稳定可用的指令" },
-  { day: "第 3 周", title: "让 AI 动手", desc: "理解 Agent 与工具权限，写出第一个 skill" },
-  { day: "第 30 天", title: "接进日常", desc: "四条流水线跑起来，幻觉与隐私有底线" },
+const PHASES = [
+  { no: "01", name: "AI 基本功", desc: "只会用干活用得上的部分", href: "/learn" },
+  { no: "02", name: "翻译与术语", desc: "术语表、上下文、机翻校订", href: "/learn/l10n-basics" },
+  { no: "03", name: "多语言批量", desc: "对照表、分批脚本、多语言质检", href: "/learn/mlt-parallel" },
+  { no: "04", name: "增量流水线", desc: "增量、独立 QA、锁定回写", href: "/learn/inc-full-vs-delta" },
+  { no: "05", name: "自动化进阶", desc: "Agent、Skill、挂件清理", href: "/learn/agent-basics" },
 ];
 
 export default async function HomePage() {
   const [items, config] = await Promise.all([getItems(), getConfig()]);
-  const latest = sortByTime(items).slice(0, 4);
+  const latest = sortByTime(items).slice(0, 3);
   const lastRun = config.lastRun;
   const enabledSources = config.sources.filter((s) => s.enabled);
-  const hotPrompts = LIBRARY.filter((i) => i.type === "prompt").slice(0, 3);
   const totalHours = Math.round((TOTAL_MINUTES / 60) * 10) / 10;
+
+  // 本地化相关模板（含多语言与增量）
+  const l10nPrompts = LIBRARY.filter(
+    (i) => i.tags.includes("本地化") || i.tags.includes("多语言") || i.tags.includes("增量")
+  );
+  const featured = ["prompt-l10n-glossary", "prompt-l10n-translate", "prompt-inc-generate"]
+    .map((id) => LIBRARY.find((i) => i.id === id))
+    .filter((x): x is (typeof LIBRARY)[number] => Boolean(x));
 
   return (
     <>
@@ -55,41 +69,43 @@ export default async function HomePage() {
           <div className="hero-inner">
             <span className="hero-kicker">
               <i />
-              知识库每日自动更新
-              {lastRun ? ` · 最近一次 ${relTime(lastRun.finishedAt)}` : " · 等待首次抓取"}
+              面向游戏本地化 · 知识库每日自动更新
+              {lastRun ? ` · 最近一次 ${relTime(lastRun.finishedAt)}` : ""}
             </span>
             <h1 className="hero-title">
-              不懂技术，也能<em>真正会用 AI</em>
+              把本地化从手工活，
+              <br />
+              变成<em>能跑的流水线</em>
             </h1>
             <p className="hero-desc">
-              从「帮我写个方案」到能设计自己的 Agent 和 Skill。
-              {LESSONS.length} 节课、{LIBRARY.length} 个可直接复制的模板，配一个每天自动更新的 AI
-              知识库 —— 不用追进度，一天 15 分钟就够。
+              只讲游戏本地化要用的：术语表、上下文翻译、多语言对照、增量与质检。
+              {LESSONS.length} 节课走完一条路，配 {l10nPrompts.length} 个能直接复制的模板，
+              和一套现成的增量流水线工具。
             </p>
             <div className="hero-actions">
               <Link href="/learn/start-here" className="btn btn-primary">
-                从第一课开始 →
+                从第 1 课开始 →
               </Link>
-              <Link href="/knowledge" className="btn btn-ghost">
-                看看今天更新了什么
-              </Link>
+              <a href="#quiz" className="btn btn-ghost">
+                3 个问题，找到我的起点
+              </a>
             </div>
             <div className="hero-stats">
               <div className="stat">
                 <div className="stat-num">{LESSONS.length} 节</div>
-                <div className="stat-label">课程 · 约 {totalHours} 小时</div>
+                <div className="stat-label">5 个阶段 · 约 {totalHours} 小时</div>
+              </div>
+              <div className="stat">
+                <div className="stat-num">{l10nPrompts.length} 个</div>
+                <div className="stat-label">本地化模板（含别用场景）</div>
+              </div>
+              <div className="stat">
+                <div className="stat-num">{GLOSSARY.length} 条</div>
+                <div className="stat-label">术语 · 人话解释</div>
               </div>
               <div className="stat">
                 <div className="stat-num">{items.length} 条</div>
-                <div className="stat-label">知识库条目</div>
-              </div>
-              <div className="stat">
-                <div className="stat-num">{LIBRARY.length} 个</div>
-                <div className="stat-label">提示词 / Agent / Skill</div>
-              </div>
-              <div className="stat">
-                <div className="stat-num">每日</div>
-                <div className="stat-label">{enabledSources.length} 个源自动抓取</div>
+                <div className="stat-label">{enabledSources.length} 个源每日抓取</div>
               </div>
             </div>
           </div>
@@ -97,98 +113,141 @@ export default async function HomePage() {
       </section>
 
       <div className="container">
+        {/* 三档入口 */}
         <section className="section">
           <div className="section-head">
             <div>
-              <div className="eyebrow">三条主线</div>
-              <h2 className="section-title">学什么，先说清楚</h2>
+              <div className="eyebrow">选一个起点</div>
+              <h2 className="section-title">按自己的水平进来</h2>
               <p className="section-desc">
-                不堆概念。每条主线都从「你今天会遇到的具体问题」出发，学完就能用。
+                不分岗位、不挑方向——本地化就一条路。你只需要选自己现在在哪一档。
               </p>
             </div>
             <Link href="/learn" className="link-arrow">
-              全部课程 →
+              看完整路径 →
             </Link>
           </div>
           <div className="grid grid-3">
-            {TRACKS.map((track) => (
-              <Link key={track.title} href={track.href} className="card hoverable">
-                <div className="card-icon">{track.icon}</div>
-                <div className="card-title">{track.title}</div>
-                <p className="card-desc">{track.desc}</p>
-                <div className="card-meta">
-                  <span className="chip">{track.badge}</span>
-                  <span>开始读 →</span>
+            {TIERS.map((tier) => (
+              <Link key={tier.title} href={tier.href} className="tier-card">
+                <span className="tier-emoji">{tier.emoji}</span>
+                <div className="tier-title">{tier.title}</div>
+                <p className="tier-desc">{tier.desc}</p>
+                <div className="tier-meta">
+                  <span className="chip">{tier.meta}</span>
+                  <span style={{ color: "var(--brand)", fontWeight: 700 }}>{tier.cta} →</span>
                 </div>
               </Link>
             ))}
           </div>
-
-          <Link
-            href="/learn/l10n-basics"
-            className="card hoverable"
-            style={{
-              marginTop: 18,
-              background: "linear-gradient(120deg,#eef2ff,#f5f3ff)",
-              borderColor: "#dfe3f8",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 16,
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <div className="eyebrow">新增专题 · 6 节课</div>
-                <div className="card-title">语言本地化（i18n / l10n）</div>
-                <p className="card-desc">
-                  用 DeepSeek Harness + Codex 做翻译、术语管理、质检：从「翻译 ≠ 本地化」到「代码级本地化」的完整新手实战课。
-                </p>
-              </div>
-              <span className="btn btn-primary btn-sm">开始学 →</span>
-            </div>
-          </Link>
         </section>
 
+        {/* 诊断 */}
+        <section className="section" id="quiz">
+          <div className="section-head">
+            <div>
+              <div className="eyebrow">不确定从哪开始？</div>
+              <h2 className="section-title">3 个问题，1 分钟</h2>
+              <p className="section-desc">
+                按你现在的实际情况答，直接推荐一个起点。测完会告诉你去哪一节。
+              </p>
+            </div>
+          </div>
+          <div style={{ maxWidth: 640 }}>
+            <LevelQuiz />
+          </div>
+        </section>
+
+        {/* 五阶段 */}
         <section className="section">
           <div className="section-head">
             <div>
-              <div className="eyebrow">学习节奏</div>
-              <h2 className="section-title">一个月，从会问到会用</h2>
+              <div className="eyebrow">一条路走完</div>
+              <h2 className="section-title">5 个阶段，顺序已经排好</h2>
               <p className="section-desc">
-                不用脱产。每天 15 分钟，按顺序做，第 30 天你会有一份自己的 AI 使用说明。
+                不用挑、不用跳。每个阶段都写清了「学完能做到什么」。
               </p>
             </div>
             <Link href="/learn" className="link-arrow">
-              完整计划 →
+              全部 {LESSONS.length} 节课 →
             </Link>
           </div>
-          <div className="grid grid-4">
-            {STEPS.map((step) => (
-              <div key={step.day} className="card">
-                <span className="chip" style={{ alignSelf: "flex-start" }}>
-                  {step.day}
-                </span>
-                <div className="card-title" style={{ fontSize: 16 }}>
-                  {step.title}
+          <div className="grid grid-3">
+            {PHASES.map((phase) => (
+              <Link key={phase.no} href={phase.href} className="card hoverable">
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <span
+                    style={{
+                      flex: "none",
+                      width: 32,
+                      height: 32,
+                      borderRadius: 9,
+                      display: "grid",
+                      placeItems: "center",
+                      fontSize: 12,
+                      fontWeight: 800,
+                      color: "#fff",
+                      background: "linear-gradient(135deg,#4f46e5,#0ea5e9)",
+                    }}
+                  >
+                    {phase.no}
+                  </span>
+                  <div className="card-title" style={{ fontSize: 16 }}>
+                    {phase.name}
+                  </div>
                 </div>
-                <p className="card-desc">{step.desc}</p>
+                <p className="card-desc">{phase.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 模板精选 */}
+        <section className="section">
+          <div className="section-head">
+            <div>
+              <div className="eyebrow">拿来就用</div>
+              <h2 className="section-title">每个模板都写了「什么时候别用」</h2>
+              <p className="section-desc">
+                只给「什么时候用」的模板会害人。我们连不该用的场景一起写清楚，避免你照抄进坑里。
+              </p>
+            </div>
+            <Link href="/library" className="link-arrow">
+              全部 {LIBRARY.length} 个模板 →
+            </Link>
+          </div>
+          <div className="grid grid-3">
+            {featured.map((item) => (
+              <div key={item.id} className="card">
+                <div className="card-title" style={{ fontSize: 16 }}>
+                  {item.title}
+                </div>
+                <p className="card-desc">{item.goal}</p>
+                {item.whenNot && (
+                  <p className="lib-when lib-whennot" style={{ fontSize: 12.5 }}>
+                    <strong>❌ 别用：</strong>
+                    {item.whenNot}
+                  </p>
+                )}
+                <div className="copy-row" style={{ marginTop: "auto" }}>
+                  <CopyButton text={item.content} label="复制" />
+                  <Link href={`/library#${item.id}`} className="link-arrow">
+                    看全文
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
+        {/* 每日情报 */}
         <section className="section">
           <div className="section-head">
             <div>
-              <div className="eyebrow">今日知识库</div>
-              <h2 className="section-title">别人踩过的坑，你不用再踩</h2>
+              <div className="eyebrow">每日情报</div>
+              <h2 className="section-title">AI 圈的新东西，挑跟你有关的</h2>
               <p className="section-desc">
-                每天从 {enabledSources.length} 个公开源自动抓取，只保留和「怎么用」有关的部分，写成人话。
+                每天从 {enabledSources.length} 个公开源抓取，用大模型写成中文摘要，只保留和「怎么用」有关的部分。
               </p>
             </div>
             <Link href="/knowledge" className="link-arrow">
@@ -216,69 +275,36 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* 工具包 */}
         <section className="section">
-          <div className="section-head">
-            <div>
-              <div className="eyebrow">拿来就用</div>
-              <h2 className="section-title">三个今天就能复制的模板</h2>
-              <p className="section-desc">
-                把【】里的内容换成你的，直接粘进任意 AI 对话框。模板库还有更多。
-              </p>
-            </div>
-            <Link href="/library" className="link-arrow">
-              模板库 →
-            </Link>
-          </div>
-          <div className="grid grid-3">
-            {hotPrompts.map((item) => (
-              <div key={item.id} className="card">
-                <div className="card-title">{item.title}</div>
-                <p className="card-desc">{item.goal}</p>
-                <div className="card-meta">
-                  {item.tags.slice(0, 2).map((tag) => (
-                    <span key={tag} className="chip">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="copy-row">
-                  <CopyButton text={item.content} label="复制提示词" />
-                  <Link href={`/library#${item.id}`} className="link-arrow">
-                    看说明
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="card" style={{ background: "linear-gradient(120deg,#0b1024,#1c2450)" }}>
+          <div
+            className="card"
+            style={{ background: "linear-gradient(120deg,#0b1024,#1c2450)", borderColor: "#232c55" }}
+          >
             <div style={{ color: "#fff", fontSize: 20, fontWeight: 800 }}>
-              每天更新的内容，从哪来？
+              增量本地化工具包（可下载）
             </div>
-            <p style={{ color: "#b9c2dd", margin: "8px 0 14px", fontSize: 14.5 }}>
-              不做二次搬运。定时任务抓取公开 RSS，交给大模型写成新手能懂的摘要，保留原文链接，全部可追溯。
-              {lastRun
-                ? ` 上次运行：${formatDateTime(lastRun.finishedAt)}，新增 ${lastRun.added} 条，用时 ${Math.round(
-                    lastRun.durationMs / 1000
-                  )} 秒。`
-                : " 首次抓取还没跑，可以在管理台手动触发。"}
+            <p style={{ color: "#b9c2dd", margin: "10px 0 16px", fontSize: 14.5, maxWidth: 720 }}>
+              算增量 → 四件套翻译 → 机检 QA → 锁定回写，一条命令跑完。
+              带演示数据（全量表 + 新版源文 + 术语表 + 风格指导），改配置就能对你们自己的语言表用。
             </p>
-            <div className="chips">
-              {enabledSources.map((s) => (
-                <span
-                  key={s.id}
-                  className="chip"
-                  style={{ background: "rgba(255,255,255,.08)", color: "#dfe5ff" }}
-                >
-                  {s.name}
+            <div className="chips" style={{ marginBottom: 18 }}>
+              {["Python 单文件", "只需 openpyxl", "16 项机检规则", "幂等可重跑"].map((tag) => (
+                <span key={tag} className="chip" style={{ background: "rgba(255,255,255,.08)", color: "#dfe5ff" }}>
+                  {tag}
                 </span>
               ))}
             </div>
-            <div style={{ marginTop: 18 }}>
-              <Link href="/knowledge" className="btn btn-primary btn-sm">
-                进入知识库
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <a
+                href="/downloads/incremental-l10n.zip"
+                className="btn btn-primary btn-sm"
+                download
+              >
+                下载工具包
+              </a>
+              <Link href="/learn/inc-lock" className="btn btn-ghost btn-sm">
+                看怎么用 →
               </Link>
             </div>
           </div>

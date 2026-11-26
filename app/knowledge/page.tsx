@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "每日知识库",
-  description: "AI 新闻、使用技巧、工具上新、前沿研究，每天自动抓取并写成新手能看懂的人话。",
+  description: "只挑跟本地化有关的：语言行业动向、翻译与语音技术、游戏出海的 AI 用法，每天自动抓取并写成人话。",
 };
 
 const PAGE_SIZE = 20;
@@ -62,10 +62,10 @@ export default async function KnowledgePage({
         <div>
           <div className="eyebrow">每日知识库</div>
           <h1 className="section-title" style={{ fontSize: "clamp(26px,3.4vw,36px)" }}>
-            今天 AI 圈发生了什么
+            今天有什么跟本地化有关
           </h1>
           <p className="section-desc">
-            共 {items.length} 条，来自 {sources.length} 个源。
+            共 {items.length} 条，来自 {sources.length} 个源。泛 AI 源只保留跟翻译、语言、多语言沾边的。
             {lastRun
               ? ` 最近一次更新：${formatDateTime(lastRun.finishedAt)}（新增 ${lastRun.added} 条）`
               : " 首次自动抓取还没跑，先看下面的冷启动内容。"}

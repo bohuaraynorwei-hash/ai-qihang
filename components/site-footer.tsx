@@ -7,10 +7,11 @@ export function SiteFooter() {
       <div className="container footer-inner">
         <div>
           <div style={{ fontWeight: 700, color: "#1f2738", marginBottom: 6 }}>
-            AI 启航 · 零基础学会用 AI
+            AI 启航 · 游戏本地化的 AI 工作台
           </div>
           <div>
-            课程内容长期有效，知识库由定时任务每日抓取公开 RSS 自动更新。
+            只讲本地化要用的东西：术语表、上下文翻译、多语言对照、增量流水线。
+            知识库由定时任务每日抓取公开 RSS 自动更新。
             <br />
             所有信息仅供参考，涉及钱、健康、法律的事情请找专业来源二次确认。
           </div>

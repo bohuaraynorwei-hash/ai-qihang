@@ -27,6 +27,7 @@ function sanitizeSources(input: unknown): Source[] | null {
       category: CATEGORIES.includes(s.category as Category) ? (s.category as Category) : "news",
       enabled: Boolean(s.enabled),
       aiOnly: Boolean(s.aiOnly),
+      l10nOnly: Boolean(s.l10nOnly),
       note: typeof s.note === "string" ? s.note.slice(0, 200) : undefined,
     });
   });

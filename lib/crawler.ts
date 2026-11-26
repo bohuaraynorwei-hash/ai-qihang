@@ -1,4 +1,4 @@
-import { AI_ONLY_RE } from "./ai-terms";
+import { AI_ONLY_RE, L10N_ONLY_RE } from "./ai-terms";
 import { chatJSON, resolveLLM, type ResolvedLLM } from "./llm";
 import { parseFeed, stripHtml } from "./rss";
 import { getConfig, getItems, getStoredItems, saveConfig, saveItems, storageMode } from "./store";
@@ -121,15 +121,15 @@ function guessTags(text: string): string[] {
   return uniq(map.filter(([re]) => re.test(text)).map(([, tag]) => tag)).slice(0, 4);
 }
 
-const SYSTEM_PROMPT = `你是中文 AI 教育平台「AI 启航」的内容编辑，读者是完全的 AI 新手。
-给你一批英文/中文的 AI 资讯标题和摘要，请为每一条写成新手能看懂的卡片。
+const SYSTEM_PROMPT = `你是中文游戏本地化平台的每日情报编辑，读者是做游戏本地化的翻译、审校和本地化 PM。
 
-要求：
-1. 用中文重写标题：保留专有名词英文原名（如 GPT-5、Claude、MCP），不要用夸张营销词（"炸裂""颠覆"）。
-2. summary：2-3 句，讲清楚"发生了什么 / 对普通用户意味着什么"。禁止编造原文没有的数字和事实；原文信息不足就只写能确定的部分。
-3. points：2-3 条要点，每条不超过 28 字，写"能带走的东西"而不是复述标题。信息不足时可以给 1 条。
+给你一批标题和摘要，请为每一条写成卡片。核心要求：**站在本地化从业者的角度判断这条东西值不值得看**。
+
+1. 用中文重写标题：保留专有名词英文原名，不要夸张营销词。
+2. summary：2-3 句，写清「发生了什么」+「对本地化工作意味着什么」。如果是和本地化无关的纯模型新闻，就点明它可能影响哪一环（成本、术语一致性、审校速度、多语言覆盖）。禁止编造原文没有的数字和事实；信息不足就只写能确定的部分。
+3. points：2-3 条要点，每条不超过 28 字。优先写「能不能用上 / 要不要留意」这类判断，而不是复述标题。信息不足时可只给 1 条。
 4. category 只能取 news（行业动态）/ skill（使用技巧）/ tool（工具上新）/ research（前沿研究）之一。
-5. tags：2-4 个中文短标签，如 "Agent"、"提示词"、"开源"、"编程"。
+5. tags：2-4 个中文短标签，如 "术语表"、"机器翻译"、"多语言"、"开源"、"审校"。
 6. level：新手也能立刻懂的填 "入门"，需要一点技术背景的填 "进阶"。
 7. 只输出 JSON 数组，不要任何解释文字。格式：
 [{"i":0,"title":"...","summary":"...","points":["..."],"category":"news","tags":["..."],"level":"入门"}]`;
@@ -279,6 +279,8 @@ export async function runCrawl(
         if (storedIds.has(id) || seenIds.has(id)) continue;
         const text = `${item.title} ${item.summary}`;
         if (source.aiOnly && !AI_ONLY_RE.test(text)) continue;
+        // 泛 AI 源只收跟本地化沾边的，保证知识库不被通用资讯冲淡
+        if (source.l10nOnly && !L10N_ONLY_RE.test(text)) continue;
         if (config.keywords.length > 0) {
           const hit = config.keywords.some((k) => text.toLowerCase().includes(k.toLowerCase()));
           if (!hit) continue;

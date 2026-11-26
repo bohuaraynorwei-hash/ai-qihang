@@ -20,7 +20,7 @@ export function SiteHeader() {
           <span className="brand-mark">启</span>
           <span>
             AI 启航
-            <small>零基础 · 每日更新</small>
+            <small>游戏本地化 · 每日更新</small>
           </span>
         </Link>
         <nav className="nav-links" aria-label="主导航">
