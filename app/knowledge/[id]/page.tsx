@@ -5,6 +5,7 @@ import { CATEGORY_META } from "@/lib/defaults";
 import { getItems } from "@/lib/store";
 import { sortByTime } from "@/lib/query";
 import { formatDateTime } from "@/lib/util";
+import { ReportError } from "@/components/report-error";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,12 @@ export default async function KnowledgeDetailPage({
           <time dateTime={item.publishedAt}>{formatDateTime(item.publishedAt)}</time>
           <span>·</span>
           <span>{item.level}</span>
+          {item.proofreadAt && (
+            <span className="proofread-badge" title={`自动校对于 ${formatDateTime(item.proofreadAt)}`}>
+              ✓ 已校对
+              {item.corrections ? ` · 修正 ${item.corrections} 处` : ""}
+            </span>
+          )}
         </div>
 
         <h1 style={{ fontSize: "clamp(25px,3.4vw,34px)", fontWeight: 850, letterSpacing: "-0.02em" }}>
@@ -95,6 +102,8 @@ export default async function KnowledgeDetailPage({
           这条摘要由大模型基于原文生成，可能有偏差。涉及具体数字、政策、价格时，请点开原文核对。
           原文版权归 <strong>{item.source}</strong> 所有。
         </div>
+
+        <ReportError itemId={item.id} title={item.title} summary={item.summary} points={item.points} />
       </article>
 
       {related.length > 0 && (

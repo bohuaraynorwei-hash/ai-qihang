@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Category, CrawlConfig, CrawlReport, Source } from "@/lib/types";
 import { CopyButton } from "./copy-button";
+import { AdminCorrections } from "./admin-corrections";
 
 type SafeConfig = CrawlConfig & { llmKeySet?: boolean };
 
@@ -501,6 +502,8 @@ export function AdminApp() {
               <span className="hint">填了之后，只保留标题或摘要里命中这些词的条目。</span>
             </div>
           </div>
+
+          <AdminCorrections password={password} />
 
           <div className="panel">
             <div className="panel-title">大模型 API（用来写中文摘要）</div>

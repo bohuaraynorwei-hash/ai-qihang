@@ -5,10 +5,17 @@
     {
       "path": "/api/cron/crawl",
       "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/api/cron/proofread",
+      "schedule": "50 0 * * *"
     }
   ],
   "functions": {
     "app/api/cron/crawl/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/cron/proofread/route.ts": {
       "maxDuration": 60
     },
     "app/api/crawl/route.ts": {

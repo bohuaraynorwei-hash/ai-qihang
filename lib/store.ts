@@ -1,13 +1,17 @@
 import { DEFAULT_CONFIG } from "./defaults";
 import { SEED_ITEMS } from "./seed";
-import type { CrawlConfig, KnowledgeItem } from "./types";
+import type { Correction, CrawlConfig, KnowledgeItem } from "./types";
 
 const KEY_CONFIG = "aiqihang:config";
 const KEY_ITEMS = "aiqihang:items";
+const KEY_CORRECTIONS = "aiqihang:corrections";
 
-type Memory = { config?: CrawlConfig; items?: KnowledgeItem[] };
+type Memory = { config?: CrawlConfig; items?: KnowledgeItem[]; corrections?: Correction[] };
 const globalRef = globalThis as unknown as { __aiqihangMemory?: Memory };
 const memory: Memory = (globalRef.__aiqihangMemory ??= {});
+
+/** 纠错记录最多保留多少条 */
+const CORRECTION_RETENTION = 500;
 
 /** Upstash 的 HTTP REST 接口（Vercel 上的默认方案） */
 function upstashCreds(): { url: string; token: string } | null {
@@ -258,6 +262,46 @@ export async function saveItems(items: KnowledgeItem[]): Promise<boolean> {
   memory.items = items;
   if (storageBackend() === "memory") return true;
   return redisSetJSON(KEY_ITEMS, items);
+}
+
+// ---------------------------------------------------------------- 纠错记录
+
+export async function getCorrections(): Promise<Correction[]> {
+  if (storageBackend() !== "memory") {
+    return (await redisGetJSON<Correction[]>(KEY_CORRECTIONS)) ?? [];
+  }
+  return memory.corrections ?? [];
+}
+
+export async function saveCorrections(list: Correction[]): Promise<boolean> {
+  // 新的在前，超量截断
+  const trimmed = [...list]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, CORRECTION_RETENTION);
+  memory.corrections = trimmed;
+  if (storageBackend() === "memory") return true;
+  return redisSetJSON(KEY_CORRECTIONS, trimmed);
+}
+
+/** 追加纠错记录（自动 + 人工都走这里） */
+export async function appendCorrections(list: Correction[]): Promise<boolean> {
+  if (list.length === 0) return true;
+  const existing = await getCorrections();
+  return saveCorrections([...list, ...existing]);
+}
+
+/** 更新某条纠错记录的状态（审核用） */
+export async function updateCorrection(
+  id: string,
+  patch: Partial<Correction>
+): Promise<Correction | null> {
+  const list = await getCorrections();
+  const idx = list.findIndex((c) => c.id === id);
+  if (idx === -1) return null;
+  const next = { ...list[idx], ...patch };
+  list[idx] = next;
+  await saveCorrections(list);
+  return next;
 }
 
 export function configFromEnv(): Partial<CrawlConfig> | null {
